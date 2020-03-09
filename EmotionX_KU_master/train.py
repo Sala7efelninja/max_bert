@@ -7,13 +7,14 @@ from tqdm import tqdm
 from EmotionX_KU_master.hparams import EMOTIONX_MODEL_HPARAMS
 from EmotionX_KU_master.models import EmotionX_Model
 from EmotionX_KU_master.utils import load_data, shuffle_trainset, get_batch, print_params
+import pickle
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 torch.manual_seed(0)
 
 
-def Train_Model():
+def train():
     if not torch.cuda.is_available():
         raise NotImplementedError()
     hparams = type('', (object,), EMOTIONX_MODEL_HPARAMS)()  # dict to class
@@ -104,10 +105,9 @@ def Train_Model():
 
                 model.train()
 
-    torch.save(model.state_dict(), hparams.save_dir+'/'+hparams.model_name+'.pt')
-
-    # labeling
-    # from EmotionX_KU_master.label import label
-    # label(hparams.label_path, model, hparams.n_appear)
+    torch.save(model.state_dict(), hparams.save_dir + hparams.trained_model)
+    pickle.dump(hparams.n_appear, open(hparams.save_dir+'hparams.txt', 'wb'))
 
 
+if __name__ == '__main__':
+    train()

@@ -3,7 +3,8 @@ from collections import defaultdict
 EMOTIONX_MODEL_HPARAMS = defaultdict(
     description='base',
     model_name='base_max_both_em',
-
+    trained_model='/model.pt',
+    result='/result.json',
     # fr_test_path='data/friends_test.json',
     fr_test_path='data/friends_test.json',
     fr_train_path='data/friends_train.json',
@@ -11,8 +12,7 @@ EMOTIONX_MODEL_HPARAMS = defaultdict(
     # em_test_path='data/emotionpush_test.json',
     # em_train_path='data/emotionpush_train.json',
 
-    save_dir='./last_train/',
-    train_dir='./saves/',
+    save_dir='./saves/',
     log_dir='./logs/',
     log_micro_f1='micro_f1',
     log_wce_loss='train_loss',

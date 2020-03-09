@@ -1,6 +1,6 @@
 import os
 import json
-
+import pickle
 import torch
 
 from EmotionX_KU_master.hparams import EMOTIONX_MODEL_HPARAMS
@@ -9,16 +9,11 @@ from EmotionX_KU_master.models import EmotionX_Model
 from EmotionX_KU_master.utils import get_batch
 
 
-#
-# def set_n_appear(n_appear):
-#     hparams.n_appear=n_appear
-
-def label(test_json_path, model, n_appear, pretrained_model_path=None, name=None, email=None):
+def label(test_json_path):
     if not torch.cuda.is_available():
         raise NotImplementedError()
     hparams = type('', (object,), EMOTIONX_MODEL_HPARAMS)()  # dict to class
-    # hparams.n_appear = [65508, 15240, 4048, 3596, 28552]  # not to be used
-    # hparams.n_appear = [46, 9, 6, 3, 32]  # not to be used
+    hparams.n_appear = pickle.load(open(hparams.save_dir + 'hparams.txt', 'rb'))  # dict to class
 
     print('preprocessing...')
     tokenizer = BertTokenizer.from_pretrained(hparams.bert_type)
@@ -37,8 +32,8 @@ def label(test_json_path, model, n_appear, pretrained_model_path=None, name=None
 
     print('prediction...')
 
-    # checkpoint = torch.load(pretrained_model_path)
-    # model.load_state_dict(checkpoint['model_state_dict'])
+    model = EmotionX_Model(hparams)
+    model.load_state_dict(torch.load(hparams.save_dir + hparams.trained_model))
     model.cuda()
     model.eval()
     pred_list = []
@@ -55,11 +50,8 @@ def label(test_json_path, model, n_appear, pretrained_model_path=None, name=None
         for utter_dict in dialog:
             utter_dict['emotion'] = index_to_emotion[pred_list[0]]
             pred_list.pop(0)
-    # result = [{'name': name, 'email': email}, json_data]
-    json.dump(json_data, open(hparams.train_dir+'/result.json', 'w'), indent=4, sort_keys=True)
+    json.dump(json_data, open(hparams.train_dir + hparams.result, 'w'), indent=4, sort_keys=True)
 
-# if __name__ == '__main__':
-#     label('data/friends_dev.json',
-#           None, None, None
-#           # 'Kisu Yang', 'willow4@korea.ac.kr'
-#           )
+
+if __name__ == '__main__':
+    label('data/friends_dev.json')
